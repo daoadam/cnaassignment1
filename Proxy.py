@@ -139,7 +139,7 @@ while True:
     # ~~~~ END CODE INSERT ~~~~
     cacheFile.close()
     print ('Sent to the client:')
-    print ('> ' + cacheData)
+    print ('> ' + "".join(cacheData))
     clientSocket.close() # adding this to close the client socket
     continue  # adding this to move to the next connection
   except:
@@ -148,7 +148,7 @@ while True:
     # Create a socket to connect to origin server
     # and store in originServerSocket
     # ~~~~ INSERT CODE ~~~~
-    
+    originServerSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     # ~~~~ END CODE INSERT ~~~~
 
     print ('Connecting to:\t\t' + hostname + '\n')
@@ -157,8 +157,14 @@ while True:
       address = socket.gethostbyname(hostname)
       # Connect to the origin server
       # ~~~~ INSERT CODE ~~~~
-      #create  new socket to origin server
-      originServerSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+      #set destination to port 80 for origin server
+      #timeout at 10 seconds
+      #connect to origin server using its ip and port
+      #reset timeout to None for infinite loop
+      originPort = 80
+      originServerSocket.settimeout(10.0)
+      originServerSocket.connect((address, originPort))
+      originServerSocket.settimeout(None)
       # ~~~~ END CODE INSERT ~~~~
       print ('Connected to origin Server')
 
@@ -169,14 +175,23 @@ while True:
       # originServerRequest is the first line in the request and
       # originServerRequestHeader is the second line in the request
       # ~~~~ INSERT CODE ~~~~
-      #set destination to port 80 for origin server
-      #timeout at 10 seconds
-      #connect to origin server using its ip and port
-      #reset timeout to None for infinite loop
-      originPort = 80
-      originServerSocket.settimeout(10.0)
-      originServerSocket.connect((address, originPort))
-      originServerSocket.settimeout(None)
+      #first line of HTTP request is to send to origin server
+      #format is "METHOD RESOURCE HTTP_VERSION"
+      #but for this its always GET request and HTTP version 1.1
+      originServerRequest = f"GET {resource} HTTP/1.1"
+
+      #list of HTTP headers to be included in the request
+      headers_list = [
+          f"Host: {hostname}", #hostname
+          "Connection: close", #close connection 
+          "User-Agent: SimpleProxy/1.0", #identify proxy
+          "Accept: */*", #accept any content
+          "Accept-Encoding: identity" #send uncompressed data
+      ]
+
+      #join headers into single string using ("\r\n") as required in http request
+      originServerRequestHeader = "\r\n".join(headers_list)
+      
       # ~~~~ END CODE INSERT ~~~~
 
       # Construct the request to send to the origin server
