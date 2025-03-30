@@ -61,6 +61,7 @@ while True:
   # Accept connection from client and store in the clientSocket
   try:
     # ~~~~ INSERT CODE ~~~~
+    #accepts a connection from the client with address
     clientSocket, addr = serverSocket.accept()
     # ~~~~ END CODE INSERT ~~~~
     print ('Received a connection')
@@ -71,6 +72,15 @@ while True:
   # Get HTTP request from client
   # and store it in the variable: message_bytes
   # ~~~~ INSERT CODE ~~~~
+  #set a timeoout for receiving data from client, if no data then timeout will raise
+  #recieve http request from client in message_bytes
+  #reset timeout to None, infinite loop for more data
+  clientSocket.settimeout(10.0)
+  message_bytes = clientSocket.recv(BUFFER_SIZE)
+  clientSocket.settimeout(None)
+  # ~~~~ END CODE INSERT ~~~~
+  message = message_bytes.decode('utf-8')
+
   # ~~~~ END CODE INSERT ~~~~
   message = message_bytes.decode('utf-8')
   print ('Received request:')
