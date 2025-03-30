@@ -148,6 +148,7 @@ while True:
     # Create a socket to connect to origin server
     # and store in originServerSocket
     # ~~~~ INSERT CODE ~~~~
+    
     # ~~~~ END CODE INSERT ~~~~
 
     print ('Connecting to:\t\t' + hostname + '\n')
@@ -156,6 +157,8 @@ while True:
       address = socket.gethostbyname(hostname)
       # Connect to the origin server
       # ~~~~ INSERT CODE ~~~~
+      #create  new socket to origin server
+      originServerSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
       # ~~~~ END CODE INSERT ~~~~
       print ('Connected to origin Server')
 
@@ -166,6 +169,14 @@ while True:
       # originServerRequest is the first line in the request and
       # originServerRequestHeader is the second line in the request
       # ~~~~ INSERT CODE ~~~~
+      #set destination to port 80 for origin server
+      #timeout at 10 seconds
+      #connect to origin server using its ip and port
+      #reset timeout to None for infinite loop
+      originPort = 80
+      originServerSocket.settimeout(10.0)
+      originServerSocket.connect((address, originPort))
+      originServerSocket.settimeout(None)
       # ~~~~ END CODE INSERT ~~~~
 
       # Construct the request to send to the origin server
